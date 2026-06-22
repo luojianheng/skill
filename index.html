@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>玩转AI棒棒哒 · 极致AI技能仓库</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --c1-from: #FF6B35; --c1-to: #FFD93D;
+            --c2-from: #FF6B9D; --c2-to: #EE5A8A;
+            --c3-from: #00C9FF; --c3-to: #6366F1;
+            --c4-from: #00E676; --c4-to: #14B8A6;
+            --c5-from: #FF6B6B; --c5-to: #FBBF24;
+            --c6-from: #A78BFA; --c6-to: #EC4899;
+            --c7-from: #FB7185; --c7-to: #F472B6;
+            --c8-from: #38BDF8; --c8-to: #8B5CF6;
+            --c9-from: #F59E0B; --c9-to: #EF4444;
+            --c10-from: #F97316; --c10-to: #D946EF;
+            --bg-primary: #FCFAFF;
+            --bg-card: rgba(255,255,255,0.82);
+            --text-primary: #1E1B2E;
+            --text-secondary: #5A5670;
+            --text-muted: #9B97AD;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 6px 24px rgba(0,0,0,0.06);
+            --shadow-card-hover: 0 4px 8px rgba(0,0,0,0.06), 0 16px 48px rgba(0,0,0,0.10);
+            --shadow-btn: 0 4px 16px rgba(255,107,53,0.28);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ========== 背景层 ========== */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.45;
+            animation: bgFloat 24s ease-in-out infinite;
+        }
+        .bg-glow:nth-child(1) {
+            width: 620px; height: 620px;
+            background: radial-gradient(circle, rgba(255,107,107,0.30), transparent 70%);
+            top: -14%; left: -8%;
+            animation-delay: 0s;
+        }
+        .bg-glow:nth-child(2) {
+            width: 520px; height: 520px;
+            background: radial-gradient(circle, rgba(167,139,250,0.25), transparent 70%);
+            top: 35%; right: -10%;
+            animation-delay: -8s;
+            animation-duration: 26s;
+        }
+        .bg-glow:nth-child(3) {
+            width: 560px; height: 560px;
+            background: radial-gradient(circle, rgba(6,182,212,0.22), transparent 70%);
+            bottom: -12%; left: 22%;
+            animation-delay: -16s;
+            animation-duration: 28s;
+        }
+        .bg-glow:nth-child(4) {
+            width: 440px; height: 440px;
+            background: radial-gradient(circle, rgba(245,158,11,0.18), transparent 70%);
+            top: 15%; left: 55%;
+            animation-delay: -4s;
+            animation-duration: 22s;
+        }
+        .bg-glow:nth-child(5) {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(16,185,129,0.18), transparent 70%);
+            bottom: 28%; right: 18%;
+            animation-delay: -12s;
+            animation-duration: 25s;
+        }
+
+        @keyframes bgFloat {
+            0%, 100% { transform: translate(0,0) scale(1); }
+            25% { transform: translate(6%,-5%) scale(1.06); }
+            50% { transform: translate(-3%,4%) scale(0.95); }
+            75% { transform: translate(-5%,-2%) scale(1.04); }
+        }
+
+        /* 科技网格纹理 */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.025;
+            background-image:
+                linear-gradient(rgba(100,100,140,0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(100,100,140,0.3) 1px, transparent 1px);
+            background-size: 64px 64px;
+        }
+
+        /* 浮动六边形粒子 */
+        .floating-particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .fp {
+            position: absolute;
+            animation: fpFloat linear infinite;
+            opacity: 0;
+        }
+        @keyframes fpFloat {
+            0%   { transform: translateY(0) rotate(0deg) scale(0); opacity: 0; }
+            10%  { opacity: 0.55; }
+            85%  { opacity: 0.25; }
+            100% { transform: translateY(-100vh) rotate(360deg) scale(1.3); opacity: 0; }
+        }
+
+        /* ========== 主容器 ========== */
+        .container {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 0 28px;
+            position: relative;
+            z-index: 3;
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            padding: 64px 0 20px;
+            text-align: center;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 18px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.75);
+            border: 1px solid rgba(0,0,0,0.06);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            margin-bottom: 28px;
+            backdrop-filter: blur(8px);
+        }
+        .hero-eyebrow .live-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #10B981;
+            animation: livePulse 2s ease-in-out infinite;
+        }
+        @keyframes livePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(16,185,129,0); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5.5vw, 4rem);
+            font-weight: 900;
+            line-height: 1.12;
+            letter-spacing: -0.025em;
+            margin-bottom: 20px;
+        }
+        .hero h1 .gradient-main {
+            background: linear-gradient(135deg, #FF6B35 0%, #F59E0B 20%, #10B981 45%, #6366F1 70%, #EC4899 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: heroGradient 7s ease infinite;
+        }
+        @keyframes heroGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 580px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        /* ========== 统计条 ========== */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin: 48px 0 56px;
+            flex-wrap: wrap;
+            padding: 32px 40px;
+            background: rgba(255,255,255,0.65);
+            backdrop-filter: blur(16px);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+        }
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 100px;
+        }
+        .stat-icon {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+        .stat-item:nth-child(1) .stat-value { color: #FF6B35; }
+        .stat-item:nth-child(2) .stat-value { color: #6366F1; }
+        .stat-item:nth-child(3) .stat-value { color: #10B981; }
+        .stat-item:nth-child(4) .stat-value { color: #F59E0B; }
+        .stat-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* ========== 分区标题 ========== */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 36px;
+        }
+        .section-header .decor-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent);
+        }
+        .section-header .section-tag {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* ========== 卡片网格 ========== */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        /* ========== 技能卡片 ========== */
+        .skill-card {
+            position: relative;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: var(--radius-lg);
+            padding: 28px 24px 24px;
+            cursor: pointer;
+            transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-card);
+            will-change: transform;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: cardEnter 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* 顶部渐变条 */
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            transition: height 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .skill-card:nth-child(1)::before  { background: linear-gradient(90deg, var(--c1-from), var(--c1-to)); }
+        .skill-card:nth-child(2)::before  { background: linear-gradient(90deg, var(--c2-from), var(--c2-to)); }
+        .skill-card:nth-child(3)::before  { background: linear-gradient(90deg, var(--c3-from), var(--c3-to)); }
+        .skill-card:nth-child(4)::before  { background: linear-gradient(90deg, var(--c4-from), var(--c4-to)); }
+        .skill-card:nth-child(5)::before  { background: linear-gradient(90deg, var(--c5-from), var(--c5-to)); }
+        .skill-card:nth-child(6)::before  { background: linear-gradient(90deg, var(--c6-from), var(--c6-to)); }
+        .skill-card:nth-child(7)::before  { background: linear-gradient(90deg, var(--c7-from), var(--c7-to)); }
+        .skill-card:nth-child(8)::before  { background: linear-gradient(90deg, var(--c8-from), var(--c8-to)); }
+        .skill-card:nth-child(9)::before  { background: linear-gradient(90deg, var(--c9-from), var(--c9-to)); }
+        .skill-card:nth-child(10)::before { background: linear-gradient(90deg, var(--c10-from), var(--c10-to)); }
+
+        @keyframes cardEnter {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .skill-card:nth-child(1)  { animation-delay: 0.04s; }
+        .skill-card:nth-child(2)  { animation-delay: 0.08s; }
+        .skill-card:nth-child(3)  { animation-delay: 0.12s; }
+        .skill-card:nth-child(4)  { animation-delay: 0.16s; }
+        .skill-card:nth-child(5)  { animation-delay: 0.20s; }
+        .skill-card:nth-child(6)  { animation-delay: 0.24s; }
+        .skill-card:nth-child(7)  { animation-delay: 0.28s; }
+        .skill-card:nth-child(8)  { animation-delay: 0.32s; }
+        .skill-card:nth-child(9)  { animation-delay: 0.36s; }
+        .skill-card:nth-child(10) { animation-delay: 0.40s; }
+
+        /* 卡片hover */
+        .skill-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(0,0,0,0.08);
+            box-shadow: var(--shadow-card-hover);
+            background: rgba(255,255,255,0.95);
+        }
+        .skill-card:hover::before { height: 5px; }
+
+        /* 各卡片hover光晕 */
+        .skill-card:nth-child(1):hover  { box-shadow: var(--shadow-card-hover), 0 0 50px rgba(255,107,53,0.12); }
+        .skill-card:nth-child(2):hover  { box-shadow: var(--shadow-card-hover), 0 0 50px rgba(255,107,157,0.12); }
+        .skill-card:nth-child(3):hover  { box-shadow: var(--shadow-card-hover), 0 0 50px rgba(0,201,255,0.12); }
+        .skill-card:nth-child(4):hover  { box-shadow: var(--shadow-card-hover), 0 0 50px rgba(0,230,118,0.12); }
+        .skill-card:nth-child(5):hover  { box-shadow: var(--shadow-card-hover), 0 0 50px rgba(255,107,107,0.12); }
+        .skill-card:nth-child(6):hover  { box-shadow: var(--shadow-card-hover), 0 0 50px rgba(167,139,250,0.12); }
+        .skill-card:nth-child(7):hover  { box-shadow: var(--shadow-card-hover), 0 0 50px rgba(251,113,133,0.12); }
+        .skill-card:nth-child(8):hover  { box-shadow: var(--shadow-card-hover), 0 0 50px rgba(56,189,248,0.12); }
+        .skill-card:nth-child(9):hover  { box-shadow: var(--shadow-card-hover), 0 0 50px rgba(245,158,11,0.12); }
+        .skill-card:nth-child(10):hover { box-shadow: var(--shadow-card-hover), 0 0 50px rgba(249,115,22,0.12); }
+
+        .skill-card:active { transform: scale(0.97); }
+
+        /* 卡片内部水印编号 */
+        .card-watermark {
+            position: absolute;
+            top: 16px; right: 16px;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: rgba(0,0,0,0.025);
+            pointer-events: none;
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+
+        /* 卡片顶部 */
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-tag {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .card-icon {
+            width: 56px; height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #fff;
+            flex-shrink: 0;
+            transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .card-icon::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.22), transparent);
+        }
+        .skill-card:nth-child(1) .card-icon  { background: linear-gradient(135deg, var(--c1-from), var(--c1-to)); }
+        .skill-card:nth-child(2) .card-icon  { background: linear-gradient(135deg, var(--c2-from), var(--c2-to)); }
+        .skill-card:nth-child(3) .card-icon  { background: linear-gradient(135deg, var(--c3-from), var(--c3-to)); }
+        .skill-card:nth-child(4) .card-icon  { background: linear-gradient(135deg, var(--c4-from), var(--c4-to)); }
+        .skill-card:nth-child(5) .card-icon  { background: linear-gradient(135deg, var(--c5-from), var(--c5-to)); }
+        .skill-card:nth-child(6) .card-icon  { background: linear-gradient(135deg, var(--c6-from), var(--c6-to)); }
+        .skill-card:nth-child(7) .card-icon  { background: linear-gradient(135deg, var(--c7-from), var(--c7-to)); }
+        .skill-card:nth-child(8) .card-icon  { background: linear-gradient(135deg, var(--c8-from), var(--c8-to)); }
+        .skill-card:nth-child(9) .card-icon  { background: linear-gradient(135deg, var(--c9-from), var(--c9-to)); }
+        .skill-card:nth-child(10) .card-icon { background: linear-gradient(135deg, var(--c10-from), var(--c10-to)); }
+
+        .skill-card:hover .card-icon {
+            transform: scale(1.1) rotate(-4deg);
+        }
+
+        /* 卡片内容 */
+        .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+        .card-title {
+            font-size: 1.18rem;
+            font-weight: 750;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.35;
+        }
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.68;
+            margin-bottom: 22px;
+            flex: 1;
+        }
+
+        /* 卡片按钮 */
+        .card-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 50px;
+            border: 1px solid rgba(0,0,0,0.06);
+            font-size: 0.84rem;
+            font-weight: 650;
+            color: var(--text-primary);
+            background: rgba(0,0,0,0.03);
+            cursor: pointer;
+            transition: all 0.38s cubic-bezier(0.23, 1, 0.32, 1);
+            align-self: flex-start;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(4px);
+        }
+        .card-btn span, .card-btn i { position: relative; z-index: 1; }
+        .card-btn i { font-size: 0.7rem; transition: transform 0.35s ease; }
+
+        .card-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50px;
+            opacity: 0;
+            transition: opacity 0.38s ease;
+        }
+        .skill-card:nth-child(1) .card-btn::before  { background: linear-gradient(135deg, var(--c1-from), var(--c1-to)); }
+        .skill-card:nth-child(2) .card-btn::before  { background: linear-gradient(135deg, var(--c2-from), var(--c2-to)); }
+        .skill-card:nth-child(3) .card-btn::before  { background: linear-gradient(135deg, var(--c3-from), var(--c3-to)); }
+        .skill-card:nth-child(4) .card-btn::before  { background: linear-gradient(135deg, var(--c4-from), var(--c4-to)); }
+        .skill-card:nth-child(5) .card-btn::before  { background: linear-gradient(135deg, var(--c5-from), var(--c5-to)); }
+        .skill-card:nth-child(6) .card-btn::before  { background: linear-gradient(135deg, var(--c6-from), var(--c6-to)); }
+        .skill-card:nth-child(7) .card-btn::before  { background: linear-gradient(135deg, var(--c7-from), var(--c7-to)); }
+        .skill-card:nth-child(8) .card-btn::before  { background: linear-gradient(135deg, var(--c8-from), var(--c8-to)); }
+        .skill-card:nth-child(9) .card-btn::before  { background: linear-gradient(135deg, var(--c9-from), var(--c9-to)); }
+        .skill-card:nth-child(10) .card-btn::before { background: linear-gradient(135deg, var(--c10-from), var(--c10-to)); }
+
+        .skill-card:hover .card-btn {
+            border-color: transparent;
+            color: #fff;
+            transform: translateX(5px);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+        }
+        .skill-card:hover .card-btn::before { opacity: 1; }
+        .skill-card:hover .card-btn i { transform: translateX(5px); }
+
+        /* ========== 邀请区 ========== */
+        .invite-section {
+            margin-top: 56px;
+            padding: 48px 40px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(255,107,53,0.06), rgba(99,102,241,0.06), rgba(16,185,129,0.04));
+            border: 1px solid rgba(0,0,0,0.05);
+            backdrop-filter: blur(12px);
+        }
+        .invite-section::before {
+            content: '';
+            position: absolute;
+            top: -40%; right: -25%;
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, rgba(245,158,11,0.08), transparent 70%);
+            pointer-events: none;
+        }
+        .invite-icon {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            display: block;
+            position: relative;
+        }
+        .invite-title {
+            font-size: 1.25rem;
+            font-weight: 750;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            position: relative;
+        }
+        .invite-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 520px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .invite-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px 40px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #FF6B35, #F59E0B);
+            color: #fff;
+            font-weight: 750;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: var(--shadow-btn);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+        }
+        .invite-link::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.22), transparent);
+            transition: opacity 0.4s;
+        }
+        .invite-link span, .invite-link i { position: relative; z-index: 1; }
+        .invite-link:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(255,107,53,0.40);
+        }
+        .invite-link:active { transform: translateY(-1px); }
+
+        .wechat-hint {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            position: relative;
+        }
+        .wechat-hint strong {
+            color: #10B981;
+            font-weight: 700;
+        }
+
+        /* ========== 页脚 ========== */
+        .footer {
+            margin-top: 48px;
+            padding: 28px 0 36px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            letter-spacing: 0.3px;
+            border-top: 1px solid rgba(0,0,0,0.04);
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .hero { padding: 40px 0 16px; }
+            .hero h1 { font-size: 2rem; }
+            .hero .subtitle { font-size: 0.98rem; }
+            .stats-row { gap: 28px; padding: 24px 20px; margin: 32px 0 40px; }
+            .stat-value { font-size: 1.6rem; }
+            .stat-label { font-size: 0.75rem; }
+            .skills-grid { grid-template-columns: 1fr; gap: 18px; }
+            .skill-card { padding: 22px 18px 20px; }
+            .card-title { font-size: 1.05rem; }
+            .card-icon { width: 48px; height: 48px; font-size: 1.3rem; border-radius: 14px; }
+            .invite-section { padding: 32px 20px; }
+            .invite-link { padding: 13px 30px; font-size: 0.92rem; }
+        }
+
+        @media (max-width: 400px) {
+            .hero h1 { font-size: 1.7rem; }
+            .stats-row { gap: 18px; }
+            .stat-value { font-size: 1.35rem; }
+            .section-header .section-tag { font-size: 0.7rem; letter-spacing: 2px; }
+        }
+
+        /* ========== 无障碍 ========== */
+        @media (prefers-reduced-motion: reduce) {
+            .bg-glow, .fp { animation: none !important; }
+            .skill-card { animation: none !important; opacity: 1; transform: none; }
+            .hero h1 .gradient-main { animation: none; }
+            *, *::before, *::after { transition-duration: 0.01ms !important; }
+        }
+
+        /* ========== 键盘焦点 ========== */
+        .skill-card:focus-visible,
+        button:focus-visible,
+        a:focus-visible {
+            outline: 2px solid #6366F1;
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 发光背景 -->
+<div class="bg-layer">
+    <div class="bg-glow"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow"></div>
+</div>
+
+<!-- 科技感网格 -->
+<div class="bg-grid"></div>
+
+<!-- 浮动粒子 -->
+<div class="floating-particles" id="floatingParticles" aria-hidden="true"></div>
+
+<!-- ==================== 内容 ==================== -->
+<div class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-eyebrow">
+            <span class="live-dot" aria-hidden="true"></span>
+            AI SKILL MARKETPLACE
+        </div>
+        <h1>
+            <span class="gradient-main">玩转AI棒棒哒</span>
+        </h1>
+        <p class="subtitle">
+            一人公司OPC的极致好用AI技能分享 &mdash; 精心打磨10款生产力工具，<br>
+            覆盖PPT创作、数据分析、产品设计、跨境出海等核心场景
+        </p>
+    </section>
+
+    <!-- 统计条 -->
+    <div class="stats-row">
+        <div class="stat-item">
+            <span class="stat-icon">✨</span>
+            <span class="stat-value">10</span>
+            <span class="stat-label">精选AI技能</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-icon">🧩</span>
+            <span class="stat-value">6</span>
+            <span class="stat-label">覆盖领域</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-icon">🎯</span>
+            <span class="stat-value">99%</span>
+            <span class="stat-label">极致打磨率</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-icon">🎁</span>
+            <span class="stat-value">3000</span>
+            <span class="stat-label">新用户积分</span>
+        </div>
+    </div>
+
+    <!-- 分区标题 -->
+    <div class="section-header">
+        <span class="decor-line"></span>
+        <span class="section-tag">SKILL 仓库</span>
+        <span class="decor-line"></span>
+    </div>
+
+    <!-- SKILLS GRID -->
+    <div class="skills-grid" id="skillsGrid">
+
+        <!-- 1 -->
+        <div class="skill-card" data-link="https://www.coze.cn/skills?skill_share_pid=7643714453460123690" tabindex="0" role="button" aria-label="PPT灵感创作大师">
+            <div class="card-watermark">01</div>
+            <div class="card-top">
+                <span class="card-tag">SKILL · 01</span>
+                <div class="card-icon"><i class="fas fa-presentation"></i></div>
+            </div>
+            <div class="card-body">
+                <div class="card-title">PPT灵感创作大师</div>
+                <div class="card-desc">输入主题 &rarr; 3种风格预览 &rarr; 挑一个喜欢的 &rarr; 自动生成高质量 .pptx + HTML 双格式PPT方案。</div>
+                <button class="card-btn" tabindex="-1"><span>立即体验</span> <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="skill-card" data-link="https://www.coze.cn/skills?skill_share_pid=7644496380937093174" tabindex="0" role="button" aria-label="手绘笔记图画设计师">
+            <div class="card-watermark">02</div>
+            <div class="card-top">
+                <span class="card-tag">SKILL · 02</span>
+                <div class="card-icon"><i class="fas fa-pen-fancy"></i></div>
+            </div>
+            <div class="card-body">
+                <div class="card-title">手绘笔记图画设计师</div>
+                <div class="card-desc">把任何文案变成一眼看懂的手绘笔记图，适配小红书、公众号配图、PPT插图等新媒体场景。</div>
+                <button class="card-btn" tabindex="-1"><span>立即体验</span> <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="skill-card" data-link="https://www.coze.cn/skills?skill_share_pid=7641868957946855443" tabindex="0" role="button" aria-label="AI产品调研竞品分析">
+            <div class="card-watermark">03</div>
+            <div class="card-top">
+                <span class="card-tag">SKILL · 03</span>
+                <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+            </div>
+            <div class="card-body">
+                <div class="card-title">AI产品调研竞品分析</div>
+                <div class="card-desc">专业AI产品调研助手，帮你搞定市场分析、竞品分析、用户调研和机会识别。</div>
+                <button class="card-btn" tabindex="-1"><span>立即体验</span> <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="skill-card" data-link="https://www.coze.cn/skills?skill_share_pid=7641124499127124014" tabindex="0" role="button" aria-label="互联网AI产品经理">
+            <div class="card-watermark">04</div>
+            <div class="card-top">
+                <span class="card-tag">SKILL · 04</span>
+                <div class="card-icon"><i class="fas fa-brain"></i></div>
+            </div>
+            <div class="card-body">
+                <div class="card-title">互联网AI产品经理</div>
+                <div class="card-desc">一句话将需求概念转化为完整专业的产品交付物，快速完成竞品分析、PRD方案与交互原型。</div>
+                <button class="card-btn" tabindex="-1"><span>立即体验</span> <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="skill-card" data-link="https://www.coze.cn/skills?skill_share_pid=7644837513437282356" tabindex="0" role="button" aria-label="跨境出海翻译官">
+            <div class="card-watermark">05</div>
+            <div class="card-top">
+                <span class="card-tag">SKILL · 05</span>
+                <div class="card-icon"><i class="fas fa-globe-asia"></i></div>
+            </div>
+            <div class="card-body">
+                <div class="card-title">跨境出海翻译官</div>
+                <div class="card-desc">全球化语言桥梁专家，不只是翻译 &mdash; 帮企业把产品实现本地化，无缝落地全球任何一个市场。</div>
+                <button class="card-btn" tabindex="-1"><span>立即体验</span> <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="skill-card" data-link="https://www.coze.cn/skills?skill_share_pid=7645195394875523091" tabindex="0" role="button" aria-label="工业级数据洞察分析师">
+            <div class="card-watermark">06</div>
+            <div class="card-top">
+                <span class="card-tag">SKILL · 06</span>
+                <div class="card-icon"><i class="fas fa-database"></i></div>
+            </div>
+            <div class="card-body">
+                <div class="card-title">工业级数据洞察分析师</div>
+                <div class="card-desc">工业级数据分析与报告生成引擎，输出 Word + HTML + Excel 三种格式报告。</div>
+                <button class="card-btn" tabindex="-1"><span>立即体验</span> <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- 7 -->
+        <div class="skill-card" data-link="https://www.coze.cn/skills?skill_share_pid=7641865646485028870" tabindex="0" role="button" aria-label="文创电商图片设计制作">
+            <div class="card-watermark">07</div>
+            <div class="card-top">
+                <span class="card-tag">SKILL · 07</span>
+                <div class="card-icon"><i class="fas fa-paint-brush"></i></div>
+            </div>
+            <div class="card-body">
+                <div class="card-title">文创电商图片设计制作</div>
+                <div class="card-desc">把任意主题变成"让人想立刻掏钱"的文创产品视觉方案 &mdash; 不是画概念图，是做商品。</div>
+                <button class="card-btn" tabindex="-1"><span>立即体验</span> <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- 8 -->
+        <div class="skill-card" data-link="https://www.coze.cn/skills?skill_share_pid=7639264405980479528" tabindex="0" role="button" aria-label="漫剧动画视频创作导演">
+            <div class="card-watermark">08</div>
+            <div class="card-top">
+                <span class="card-tag">SKILL · 08</span>
+                <div class="card-icon"><i class="fas fa-film"></i></div>
+            </div>
+            <div class="card-body">
+                <div class="card-title">漫剧动画视频创作导演</div>
+                <div class="card-desc">一句话故事 &rarr; 一键生成皮克斯 / 迪士尼 / 梦工厂风格的漫剧动画视频。</div>
+                <button class="card-btn" tabindex="-1"><span>立即体验</span> <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- 9 -->
+        <div class="skill-card" data-link="https://www.coze.cn/skills?skill_share_pid=7638893689497993279" tabindex="0" role="button" aria-label="乐高商品化图片生成器">
+            <div class="card-watermark">09</div>
+            <div class="card-top">
+                <span class="card-tag">SKILL · 09</span>
+                <div class="card-icon"><i class="fas fa-cubes"></i></div>
+            </div>
+            <div class="card-body">
+                <div class="card-title">乐高商品化图片生成器</div>
+                <div class="card-desc">将任意对象转化为乐高风格提示词与图片，支持速写定制和全案设计。</div>
+                <button class="card-btn" tabindex="-1"><span>立即体验</span> <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- 10 -->
+        <div class="skill-card" data-link="https://www.coze.cn/skills?skill_share_pid=7644781591314677814" tabindex="0" role="button" aria-label="Skill之神——宙斯">
+            <div class="card-watermark">10</div>
+            <div class="card-top">
+                <span class="card-tag">SKILL · 10</span>
+                <div class="card-icon"><i class="fas fa-bolt"></i></div>
+            </div>
+            <div class="card-body">
+                <div class="card-title">Skill之神 &mdash; 宙斯</div>
+                <div class="card-desc">将工作习惯、思维模式、操作流程转化为标准化、可复用的 AI Skill 技能创作工具。</div>
+                <button class="card-btn" tabindex="-1"><span>立即体验</span> <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 邀请区 -->
+    <div class="invite-section">
+        <span class="invite-icon">🎁</span>
+        <div class="invite-title">新用户专属福利</div>
+        <div class="invite-desc">
+            如果你还不是扣子平台注册用户，推荐你点击下方链接，下载扣子APP注册使用送 <strong style="color:#F59E0B;font-weight:700;">3000 积分</strong>
+        </div>
+        <a class="invite-link" href="https://www.coze.cn/overview/invited?invite_code=92b21ceb51fc4de6ae6674cdf2733318" target="_blank" rel="noopener">
+            <span>立即注册领取积分</span> <i class="fas fa-arrow-right"></i>
+        </a>
+        <div class="wechat-hint">
+            如有任何建议与需求，可微信关注公众号：<strong>玩转AI棒棒哒</strong>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <div class="footer">
+        <p>玩转AI棒棒哒 &copy; 2026 &nbsp;|&nbsp; 一人公司OPC · 极致好用AI技能</p>
+    </div>
+
+</div>
+
+<script>
+(function() {
+    'use strict';
+
+    // ===== 浮动六边形粒子 =====
+    const particlesContainer = document.getElementById('floatingParticles');
+    const hexColors = [
+        'rgba(255,107,53,0.35)', 'rgba(99,102,241,0.35)',
+        'rgba(6,182,212,0.35)', 'rgba(16,185,129,0.35)',
+        'rgba(245,158,11,0.35)', 'rgba(236,72,153,0.35)',
+        'rgba(139,92,246,0.30)', 'rgba(255,215,0,0.30)',
+    ];
+    for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'fp';
+        const size = Math.random() * 14 + 8;
+        const isHex = Math.random() > 0.4;
+        const color = hexColors[Math.floor(Math.random() * hexColors.length)];
+        p.style.width  = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left   = Math.random() * 100 + '%';
+        p.style.bottom = -(Math.random() * 30 + 4) + '%';
+        p.style.animationDuration = (Math.random() * 14 + 10) + 's';
+        p.style.animationDelay    = (Math.random() * 14) + 's';
+
+        if (isHex) {
+            p.innerHTML = '<svg width="100%" height="100%" viewBox="0 0 100 100"><polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="' + color + '"/></svg>';
+        } else {
+            p.style.borderRadius = '50%';
+            p.style.background = color;
+        }
+        particlesContainer.appendChild(p);
+    }
+
+    // ===== 卡片3D倾斜 + 点击 =====
+    const cards = document.querySelectorAll('.skill-card');
+    cards.forEach(card => {
+        // 3D tilt
+        card.addEventListener('mousemove', function(e) {
+            const rect = this.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const rx = ((e.clientY - cy) / (rect.height / 2)) * -6;
+            const ry = ((e.clientX - cx) / (rect.width / 2)) * 6;
+            this.style.transform = 'perspective(900px) translateY(-10px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = '';
+        });
+
+        // 点击跳转
+        card.addEventListener('click', function(e) {
+            if (e.target.closest('.card-btn')) return;
+            const link = this.dataset.link;
+            if (link) window.open(link, '_blank');
+        });
+
+        // 键盘可访问
+        card.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const link = this.dataset.link;
+                if (link) window.open(link, '_blank');
+            }
+        });
+    });
+
+    // ===== 按钮点击 =====
+    document.querySelectorAll('.card-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const card = this.closest('.skill-card');
+            const link = card.dataset.link;
+            if (!link) return;
+            card.style.transform = 'scale(0.96)';
+            setTimeout(function() {
+                card.style.transform = '';
+                window.open(link, '_blank');
+            }, 160);
+        });
+    });
+
+})();
+</script>
+
+</body>
+</html>
